@@ -4,7 +4,7 @@ import { useState } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
-import { LayoutDashboard, GitCommit, ChevronLeft, ChevronRight, Sparkles, TrendingUp } from "lucide-react"
+import { LayoutDashboard, GitCommit, ChevronLeft, ChevronRight, Sparkles, TrendingUp, Users } from "lucide-react"
 
 export default function DashboardLayout({ children }) {
   const navigate = useNavigate()
@@ -15,6 +15,7 @@ export default function DashboardLayout({ children }) {
 
   const navItems = [
     { icon: LayoutDashboard, label: "Overview", route: "/overview", active: location.pathname === "/overview" },
+    { icon: Users, label: "Teams", route: "/teams", active: location.pathname === "/teams" },
     { icon: TrendingUp, label: "Heuristic", route: "/heuristic", active: location.pathname === "/heuristic" },
     { icon: Sparkles, label: "AI", route: "/ai", active: location.pathname === "/ai" },
     { icon: GitCommit, label: "Commit Feed", route: "/commits", active: location.pathname === "/commits" },

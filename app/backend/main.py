@@ -50,6 +50,36 @@ def get_github_headers():
         "Accept": "application/vnd.github+json"
     }
 
+@app.get("/repos/{owner}/{repo}/contributors")
+def get_contributors(owner: str, repo: str, limit: int = 30):
+    """
+    Fetches contributors for a repository.
+    Returns: list of {username, avatar_url, contributions}
+    """
+    headers = get_github_headers()
+    url = f"https://api.github.com/repos/{owner}/{repo}/contributors?per_page={limit}"
+    
+    try:
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
+        contributors = response.json()
+        
+        return {
+            "repo": f"{owner}/{repo}",
+            "count": len(contributors),
+            "contributors": [
+                {
+                    "username": c["login"],
+                    "avatar_url": c["avatar_url"],
+                    "contributions": c["contributions"],
+                    "profile_url": c["html_url"]
+                }
+                for c in contributors
+            ]
+        }
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Failed to fetch contributors: {str(e)}")
+
 @app.get("/repos/{owner}/{repo}/commits")
 def get_commits(owner: str, repo: str, limit: int = 10):
     """

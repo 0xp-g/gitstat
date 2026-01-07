@@ -8,6 +8,7 @@ import OverviewPage from "./pages/OverviewPage"
 import HeuristicPage from "./pages/HeuristicPage"
 import AIPage from "./pages/AIPage"
 import CommitsPage from "./pages/CommitsPage"
+import TeamsPage from "./pages/TeamsPage"
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
@@ -38,6 +39,7 @@ function App() {
         <Route path="/heuristic" element={<HeuristicPage />} />
         <Route path="/ai" element={<AIPage />} />
         <Route path="/commits" element={<CommitsPage />} />
+        <Route path="/teams" element={<TeamsPage />} />
       </Routes>
     </DashboardLayout>
   )
