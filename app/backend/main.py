@@ -69,8 +69,7 @@ def get_commits(owner: str, repo: str, limit: int = 10):
 
     detailed_results = []
 
-    # 2. Loop through each commit and fetch the "files" details immediately
-    # This "passes down" the SHA internally so you don't have to do it manually.
+    # 2. Loop through each commit
     for commit in commits_summary:
         sha = commit["sha"]
         detail_url = f"https://api.github.com/repos/{owner}/{repo}/commits/{sha}"
@@ -80,29 +79,42 @@ def get_commits(owner: str, repo: str, limit: int = 10):
             r_detail.raise_for_status()
             data = r_detail.json()
             
-            # Extract exactly what you need
-            stats = data.get("stats", {}) # e.g. {"total": 5, "additions": 3, "deletions": 2}
+            stats = data.get("stats", {}) 
             files = data.get("files", [])
             
             file_changes = []
             for f in files:
                 file_changes.append({
                     "filename": f["filename"],
-                    "status": f["status"], # modified, added, removed
+                    "status": f["status"],
                     "additions": f["additions"],
                     "deletions": f["deletions"],
-                    "patch": f.get("patch", "") # This is the actual code diff!
+                    "patch": f.get("patch", "") 
                 })
 
-            detailed_results.append({
+            # --- FIX STARTS HERE ---
+            
+            # 1. Create the dictionary and assign it to a variable FIRST
+            commit_payload = {
                 "sha": sha,
                 "message": commit["commit"]["message"],
                 "author": commit["commit"]["author"]["name"],
                 "date": commit["commit"]["author"]["date"],
                 "total_stats": stats,
                 "files": file_changes
-            })
+            }
             
+            # 2. Now run heuristics on that variable
+            analysis = apply_heuristics(commit_payload)
+            
+            # 3. Inject the analysis results back into the payload
+            commit_payload["analysis"] = analysis
+
+            # 4. Append ONLY ONCE
+            detailed_results.append(commit_payload)
+            
+            # --- FIX ENDS HERE ---
+
         except Exception as e:
             print(f"Skipping commit {sha} due to error: {e}")
             continue
@@ -112,3 +124,91 @@ def get_commits(owner: str, repo: str, limit: int = 10):
         "count": len(detailed_results),
         "commits": detailed_results
     }
+
+def apply_heuristics(commit_data):
+    """
+    Input: commit_data dict with 'files', 'total_stats', 'message'
+    Output: dict with 'impact_score', 'category', 'tags', 'primary_language'
+    """
+    stats = commit_data.get("total_stats", {"additions": 0, "deletions": 0, "total": 0})
+    files = commit_data.get("files", [])
+    message = commit_data.get("message", "").lower()
+
+    additions = stats.get("additions", 0)
+    deletions = stats.get("deletions", 0)
+    total_changes = additions + deletions
+
+    # 1. Impact Score (weighted)
+    # Feature work (additions) feels "heavier" than deleting code
+    impact_score = min(int(additions * 1.2 + deletions * 0.8), 100)
+
+    # 2. Determine Category
+    category = "Uncategorized"
+    tags = []
+
+    is_docs_only = bool(files) and all(f['filename'].endswith(('.md', '.txt')) for f in files)
+    is_license_only = bool(files) and all(f['filename'].endswith('LICENSE') for f in files)
+
+    # Category rules (priority order)
+    if is_docs_only:
+        category = "Documentation"
+        tags.append("docs")
+    elif is_license_only:
+        category = "License Update"
+        tags.append("legal")
+    elif any(k in message for k in ["merge", "merged", "merging"]):
+        category = "Merge"
+        tags.append("maintenance")
+    elif total_changes > 200 or len(files) > 10:
+        category = "Major Feature"
+        tags.append("high-impact")
+    # Safe division: deletions > 0 check prevents ZeroDivisionError
+    elif deletions > 0 and additions > 0 and 0.8 <= (additions / deletions) <= 1.2:
+        category = "Refactor"
+        tags.append("cleanup")
+    elif any(k in message for k in ["fix", "bug", "patch", "issue"]):
+        category = "Bug Fix"
+        tags.append("bugfix")
+    elif total_changes < 10:
+        category = "Tiny Change"
+        tags.append("minor")
+    else:
+        category = "Feature Work"
+
+    # 3. Detect Risk & Sentiment
+    if len(files) > 5 or total_changes > 100:
+        tags.append("high-risk")
+    
+    if deletions > additions * 2:
+        tags.append("destructive")  # e.g. removing dead code
+        
+    if len(files) == 0:
+        tags.append("empty-commit")
+
+    # Fun/Smart: Detect Panic or Urgency
+    if any(k in message for k in ["oops", "whoops", "asap", "urgent", "damn", "hotfix"]):
+        tags.append("urgent-fix")
+
+    # 4. Detect Complexity (heuristic)
+    if any(f['filename'].endswith(('.py', '.java', '.cpp', '.js', '.ts', '.tsx')) for f in files) and total_changes > 50:
+        tags.append("complex-change")
+
+    return {
+        "impact_score": impact_score,
+        "category": category,
+        "tags": tags,
+        # Ensure your helper function 'detect_language' is still defined in the file!
+        "primary_language": detect_language(files)
+    }
+def detect_language(files):
+    # Simple extension checker
+    ext_map = {".py": "Python", ".js": "JavaScript", ".tsx": "React", ".css": "CSS", ".html": "HTML"}
+    counts = {}
+    for f in files:
+        for ext, lang in ext_map.items():
+            if f["filename"].endswith(ext):
+                counts[lang] = counts.get(lang, 0) + 1
+    
+    # Return the most frequent language found, or "Mixed"
+    if not counts: return "Misc"
+    return max(counts, key=counts.get)
