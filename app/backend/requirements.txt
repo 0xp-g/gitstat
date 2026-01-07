@@ -1,0 +1,11 @@
+fastapi
+uvicorn
+pandas
+networkx
+python-multipart
+pydantic
+python-dotenv
+httpx
+scikit-learn
+matplotlib
+sqlmodel
