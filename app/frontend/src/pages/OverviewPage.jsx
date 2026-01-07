@@ -11,7 +11,7 @@ import SilentArchitectSpotlight from "@/components/SilentArchitectSpotlight"
 import TeamHealthRadar from "@/components/TeamHealthRadar"
 import TrendAnalysis from "@/components/TrendAnalysis"
 import RiskAlerts from "@/components/RiskAlerts"
-import { fetchRepoCommits } from "@/services/api"
+import { fetchRepoCommits, fetchClosedIssues } from "@/services/api"
 import { transformCommitsToDeveloperData } from "@/utils/transformers"
 
 export default function OverviewPage() {
@@ -79,8 +79,14 @@ export default function OverviewPage() {
 
     try {
       const limit = parseInt(commitLimit) || 50;
-      const rawData = await fetchRepoCommits(owner, repo, limit);
-      const transformedData = transformCommitsToDeveloperData(rawData);
+
+      // Fetch data in parallel
+      const [rawData, issuesData] = await Promise.all([
+        fetchRepoCommits(owner, repo, limit),
+        fetchClosedIssues(repoUrl, 30) // Limit issues to 30 for now
+      ]);
+
+      const transformedData = transformCommitsToDeveloperData(rawData, issuesData);
 
       setData(transformedData);
 

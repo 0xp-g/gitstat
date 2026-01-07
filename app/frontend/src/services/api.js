@@ -40,3 +40,24 @@ export const fetchContributors = async (owner, repo, limit = 30) => {
       throw error;
    }
 };
+
+export const fetchClosedIssues = async (repoUrl, limit = 20) => {
+   try {
+      // The backend expects full repoUrl, e.g. "https://github.com/owner/repo"
+      const response = await fetch(`${API_BASE_URL}/issues/closed?repo_url=${encodeURIComponent(repoUrl)}&limit=${limit}`, {
+         headers: {
+            'Content-Type': 'application/json',
+         },
+      });
+
+      if (!response.ok) {
+         throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data;
+   } catch (error) {
+      console.error('Error fetching closed issues:', error);
+      throw error;
+   }
+};
