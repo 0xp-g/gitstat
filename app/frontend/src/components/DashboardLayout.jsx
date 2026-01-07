@@ -21,17 +21,24 @@ export default function DashboardLayout({ children }) {
   ]
 
   return (
-    <div className="min-h-screen bg-slate-950 text-foreground">
-      <div className="flex">
+    <div className="min-h-screen bg-background text-foreground relative overflow-hidden">
+      {/* Neon background effects */}
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/20 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-secondary/20 rounded-full blur-3xl" />
+        <div className="absolute top-1/2 right-0 w-64 h-64 bg-accent/15 rounded-full blur-3xl" />
+      </div>
+
+      <div className="flex relative z-10">
         {/* Sidebar */}
         <motion.aside
           initial={false}
           animate={{ width: sidebarCollapsed ? 80 : 240 }}
-          className="h-screen bg-card border-r border-border sticky top-0"
+          className="h-screen bg-card/80 backdrop-blur-xl border-r border-primary/20 sticky top-0 shadow-lg shadow-primary/10"
         >
           <div className="p-6 flex items-center justify-between">
             {!sidebarCollapsed && (
-              <motion.h2 initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-xl font-bold text-primary">
+              <motion.h2 initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-xl font-bold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
                 GitPulse
               </motion.h2>
             )}
@@ -39,7 +46,7 @@ export default function DashboardLayout({ children }) {
               variant="ghost"
               size="icon"
               onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-              className="ml-auto"
+              className="ml-auto hover:bg-primary/20"
             >
               {sidebarCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
             </Button>
@@ -49,8 +56,8 @@ export default function DashboardLayout({ children }) {
             {navItems.map((item, i) => (
               <Button
                 key={i}
-                variant={item.active ? "secondary" : "ghost"}
-                className="w-full justify-start"
+                variant={item.active ? "default" : "ghost"}
+                className={`w-full justify-start ${item.active ? "bg-gradient-to-r from-primary to-secondary text-white shadow-lg shadow-primary/30" : "hover:bg-primary/20"}`}
                 onClick={() => navigate(item.route)}
               >
                 <item.icon className="w-4 h-4" />

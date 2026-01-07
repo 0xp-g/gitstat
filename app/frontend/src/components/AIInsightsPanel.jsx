@@ -44,10 +44,10 @@ export default function AIInsightsPanel({ data }) {
   }
 
   const commitCategoryData = [
-    { name: "Production Logic", value: productionLogic.length, color: "#6366f1" },
-    { name: "Bug Fixes", value: issueResolutions.length, color: "#ef4444" },
-    { name: "Refactoring", value: data.filter((d) => d.linesDeleted > d.linesAdded).length, color: "#10b981" },
-    { name: "Feature Work", value: data.filter((d) => d.totalCommits > 20).length, color: "#f59e0b" },
+    { name: "Production Logic", value: productionLogic.length, color: "#a855f7" },
+    { name: "Bug Fixes", value: issueResolutions.length, color: "#f472b6" },
+    { name: "Refactoring", value: data.filter((d) => d.linesDeleted > d.linesAdded).length, color: "#22d3ee" },
+    { name: "Feature Work", value: data.filter((d) => d.totalCommits > 20).length, color: "#facc15" },
   ]
 
   const aiImpactData = data
@@ -90,21 +90,19 @@ export default function AIInsightsPanel({ data }) {
       <div className="flex gap-2">
         <button
           onClick={() => handleTabChange("production")}
-          className={`flex-1 py-3 px-4 rounded-lg text-sm font-medium transition-all ${
-            activeTab === "production"
-              ? "bg-primary text-primary-foreground shadow-lg shadow-primary/50"
-              : "bg-card/40 text-muted-foreground hover:text-foreground hover:bg-card/60"
-          }`}
+          className={`flex-1 py-3 px-4 rounded-lg text-sm font-medium transition-all ${activeTab === "production"
+            ? "bg-primary text-primary-foreground shadow-lg shadow-primary/50"
+            : "bg-card/40 text-muted-foreground hover:text-foreground hover:bg-card/60"
+            }`}
         >
           Production Logic
         </button>
         <button
           onClick={() => handleTabChange("issues")}
-          className={`flex-1 py-3 px-4 rounded-lg text-sm font-medium transition-all ${
-            activeTab === "issues"
-              ? "bg-primary text-primary-foreground shadow-lg shadow-primary/50"
-              : "bg-card/40 text-muted-foreground hover:text-foreground hover:bg-card/60"
-          }`}
+          className={`flex-1 py-3 px-4 rounded-lg text-sm font-medium transition-all ${activeTab === "issues"
+            ? "bg-primary text-primary-foreground shadow-lg shadow-primary/50"
+            : "bg-card/40 text-muted-foreground hover:text-foreground hover:bg-card/60"
+            }`}
         >
           Issue Resolutions
         </button>
@@ -209,11 +207,10 @@ export default function AIInsightsPanel({ data }) {
                   <button
                     key={page}
                     onClick={() => setCurrentPage(page)}
-                    className={`min-w-[40px] h-10 px-3 rounded-md transition-all ${
-                      currentPage === page
-                        ? "bg-primary text-primary-foreground font-semibold shadow-lg shadow-primary/50"
-                        : "bg-card border border-white/10 text-muted-foreground hover:text-foreground hover:border-primary/50"
-                    }`}
+                    className={`min-w-[40px] h-10 px-3 rounded-md transition-all ${currentPage === page
+                      ? "bg-primary text-primary-foreground font-semibold shadow-lg shadow-primary/50"
+                      : "bg-card border border-white/10 text-muted-foreground hover:text-foreground hover:border-primary/50"
+                      }`}
                   >
                     {page}
                   </button>
@@ -232,10 +229,10 @@ export default function AIInsightsPanel({ data }) {
         </Card>
 
         <div className="space-y-6">
-          <Card className="p-6 backdrop-blur-md bg-card/40 border-white/10 h-[300px] flex flex-col">
+          <Card className="p-6 backdrop-blur-md bg-card/40 border-white/10 h-[450px] flex flex-col">
             <div className="mb-4">
               <h2 className="text-xl font-bold text-foreground flex items-center gap-2">
-                <Lightbulb className="w-5 h-5 text-yellow-500" />
+                <Lightbulb className="w-5 h-5 text-foreground" />
                 Commit Category Distribution
               </h2>
               <p className="text-sm text-muted-foreground">Breakdown of work types</p>
@@ -248,10 +245,10 @@ export default function AIInsightsPanel({ data }) {
                     data={commitCategoryData}
                     cx="50%"
                     cy="50%"
-                    labelLine={false}
+                    labelLine={true}
                     label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                    outerRadius={120}
-                    fill="#8884d8"
+                    outerRadius={100}
+                    fill="#a855f7"
                     dataKey="value"
                   >
                     {commitCategoryData.map((entry, index) => (
@@ -260,10 +257,13 @@ export default function AIInsightsPanel({ data }) {
                   </Pie>
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: "rgba(15, 23, 42, 0.9)",
+                      backgroundColor: "hsl(0, 0%, 10%)",
                       border: "1px solid rgba(255,255,255,0.1)",
                       borderRadius: "8px",
+                      color: "#fff",
                     }}
+                    itemStyle={{ color: "#fff" }}
+                    labelStyle={{ color: "#fff" }}
                   />
                 </PieChart>
               </ResponsiveContainer>
@@ -294,12 +294,12 @@ export default function AIInsightsPanel({ data }) {
                   <YAxis stroke="rgba(255,255,255,0.5)" tick={{ fontSize: 12 }} />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: "rgba(15, 23, 42, 0.9)",
+                      backgroundColor: "hsl(0, 0%, 10%)",
                       border: "1px solid rgba(255,255,255,0.1)",
                       borderRadius: "8px",
                     }}
                   />
-                  <Bar dataKey="impact" fill="#6366f1" name="AI Impact Score" />
+                  <Bar dataKey="impact" fill="#22d3ee" name="AI Impact Score" />
                 </BarChart>
               </ResponsiveContainer>
             </div>

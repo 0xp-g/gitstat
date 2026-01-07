@@ -79,24 +79,25 @@ export default function ImpactMatrix({ data }) {
 
             <Tooltip content={<CustomTooltip />} />
 
-            <ReferenceLine x={midCommits} stroke="rgba(139, 92, 246, 0.5)" strokeWidth={2} />
-            <ReferenceLine y={midImpact} stroke="rgba(139, 92, 246, 0.5)" strokeWidth={2} />
+            <ReferenceLine x={midCommits} stroke="#a855f7" strokeWidth={2} strokeDasharray="5 5" />
+            <ReferenceLine y={midImpact} stroke="#06b6d4" strokeWidth={2} strokeDasharray="5 5" />
 
-            <Scatter name="Developers" data={data} fill="#8b5cf6">
+            <Scatter name="Developers" data={data} fill="#a855f7">
               {data.map((entry, index) => (
                 <circle
                   key={index}
-                  r={8}
+                  r={10}
                   fill={
                     entry.quadrant === "Silent Architect"
-                      ? "#8b5cf6"
+                      ? "#a855f7"
                       : entry.quadrant === "Superstar"
-                        ? "#22c55e"
+                        ? "#22d3ee"
                         : entry.quadrant === "Maintainer"
-                          ? "#3b82f6"
-                          : "#fbbf24"
+                          ? "#f472b6"
+                          : "#facc15"
                   }
-                  opacity={0.8}
+                  style={{ filter: "drop-shadow(0 0 6px currentColor)" }}
+                  opacity={0.9}
                 />
               ))}
             </Scatter>
@@ -104,10 +105,10 @@ export default function ImpactMatrix({ data }) {
         </ResponsiveContainer>
 
         {/* Quadrant labels */}
-        <div className="absolute top-8 left-16 text-xs text-primary font-medium">Silent Architect</div>
-        <div className="absolute top-8 right-24 text-xs text-green-500 font-medium">Superstar</div>
-        <div className="absolute bottom-24 left-16 text-xs text-yellow-500 font-medium">Newcomer</div>
-        <div className="absolute bottom-24 right-24 text-xs text-blue-500 font-medium">Maintainer</div>
+        <div className="absolute top-8 left-16 text-xs text-muted-foreground font-medium">Silent Architect</div>
+        <div className="absolute top-8 right-24 text-xs text-primary font-bold">Superstar</div>
+        <div className="absolute bottom-24 left-16 text-xs text-muted-foreground/60 font-medium">Newcomer</div>
+        <div className="absolute bottom-24 right-24 text-xs text-primary/80 font-medium">Maintainer</div>
       </div>
     </Card>
   )

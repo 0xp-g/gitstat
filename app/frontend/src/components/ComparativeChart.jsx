@@ -24,7 +24,7 @@ export default function ComparativeChart({ data }) {
           <p className="font-semibold text-foreground mb-2">{payload[0].payload.name}</p>
           <div className="space-y-1">
             <p className="text-sm text-primary">Heuristic: {payload[0].value}</p>
-            <p className="text-sm text-accent">AI Impact: {payload[1].value}</p>
+            <p className="text-sm text-foreground">AI Impact: {payload[1].value}</p>
             <p className="text-sm text-foreground font-semibold border-t border-white/10 pt-1 mt-1">
               Total Value: {payload[0].payload.total.toFixed(1)}
             </p>
@@ -36,10 +36,10 @@ export default function ComparativeChart({ data }) {
   }
 
   return (
-    <Card className="p-6 backdrop-blur-md bg-card/40 border-white/10">
+    <Card className="p-6 backdrop-blur-md bg-card/60 border-primary/20 shadow-lg shadow-primary/10">
       <div className="mb-4">
         <h2 className="text-2xl font-bold text-foreground flex items-center gap-2">
-          <Trophy className="w-6 h-6 text-primary" />
+          <Trophy className="w-6 h-6 text-foreground" />
           Total Value Contribution
         </h2>
         <p className="text-sm text-muted-foreground">Combined heuristic and AI-weighted rankings</p>
@@ -65,8 +65,8 @@ export default function ComparativeChart({ data }) {
               }}
               iconType="circle"
             />
-            <Bar dataKey="heuristic" stackId="a" fill="#8b5cf6" name="Heuristic Score" radius={[0, 0, 0, 0]} />
-            <Bar dataKey="aiImpact" stackId="a" fill="#22c55e" name="AI Impact Score" radius={[4, 4, 0, 0]} />
+            <Bar dataKey="heuristic" stackId="a" fill="#a855f7" name="Heuristic Score" radius={[0, 0, 0, 0]} />
+            <Bar dataKey="aiImpact" stackId="a" fill="#06b6d4" name="AI Impact Score" radius={[4, 4, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </div>

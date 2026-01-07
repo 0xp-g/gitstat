@@ -4,31 +4,62 @@
 
 @layer base {
   :root {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 8%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 8%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 263 70% 65%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 162 100% 45%;
-    --accent-foreground: 222.2 84% 4.9%;
-    --destructive: 25 90% 55%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 263 70% 65%;
-    --radius: 0.5rem;
-    --chart-1: 263 70% 65%;
-    --chart-2: 162 100% 45%;
-    --chart-3: 70 100% 55%;
-    --chart-4: 304 70% 65%;
-    --chart-5: 16 90% 55%;
+    /* Neon Modern Theme - Light Mode */
+    --background: 240 20% 98%;
+    --foreground: 240 10% 10%;
+    --card: 240 15% 95%;
+    --card-foreground: 240 10% 10%;
+    --popover: 240 15% 95%;
+    --popover-foreground: 240 10% 10%;
+    --primary: 280 100% 60%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 200 100% 50%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 240 10% 90%;
+    --muted-foreground: 240 10% 40%;
+    --accent: 160 100% 45%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 85% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 240 10% 85%;
+    --input: 240 10% 85%;
+    --ring: 280 100% 60%;
+    --radius: 0.75rem;
+    /* Vibrant Neon Chart Colors */
+    --chart-1: 280 100% 65%;
+    --chart-2: 180 100% 50%;
+    --chart-3: 320 100% 60%;
+    --chart-4: 45 100% 55%;
+    --chart-5: 200 100% 55%;
+  }
+
+  .dark {
+    /* Neon Modern Theme - Dark Mode */
+    --background: 240 15% 8%;
+    --foreground: 0 0% 98%;
+    --card: 240 15% 12%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 15% 12%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 280 100% 65%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 190 100% 50%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 240 10% 18%;
+    --muted-foreground: 240 10% 65%;
+    --accent: 160 100% 50%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 85% 55%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 240 10% 20%;
+    --input: 240 10% 20%;
+    --ring: 280 100% 65%;
+    /* Vibrant Neon Chart Colors */
+    --chart-1: 280 100% 70%;
+    --chart-2: 180 100% 55%;
+    --chart-3: 320 100% 65%;
+    --chart-4: 45 100% 60%;
+    --chart-5: 200 100% 60%;
   }
 }
 
@@ -36,8 +67,9 @@
   * {
     @apply border-border;
   }
+
   body {
-    @apply bg-background text-foreground;
-    font-family: system-ui, -apple-system, sans-serif;
+    @apply bg-background text-foreground antialiased;
+    font-family: "Inter", system-ui, -apple-system, sans-serif;
   }
 }

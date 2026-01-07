@@ -101,11 +101,11 @@ export default function HeuristicPanel({ data }) {
                     </div>
                     <div>
                       <div className="text-muted-foreground">Added</div>
-                      <div className="font-medium text-green-500">+{contributor.linesAdded}</div>
+                      <div className="font-medium text-foreground">+{contributor.linesAdded}</div>
                     </div>
                     <div>
                       <div className="text-muted-foreground">Deleted</div>
-                      <div className="font-medium text-red-500">-{contributor.linesDeleted}</div>
+                      <div className="font-medium text-muted-foreground">-{contributor.linesDeleted}</div>
                     </div>
                   </div>
                 </motion.div>
@@ -132,11 +132,10 @@ export default function HeuristicPanel({ data }) {
                   <button
                     key={page}
                     onClick={() => setCurrentPage(page)}
-                    className={`min-w-[40px] h-10 px-3 rounded-md transition-all ${
-                      currentPage === page
-                        ? "bg-primary text-primary-foreground font-semibold shadow-lg shadow-primary/50"
-                        : "bg-card border border-white/10 text-muted-foreground hover:text-foreground hover:border-primary/50"
-                    }`}
+                    className={`min-w-[40px] h-10 px-3 rounded-md transition-all ${currentPage === page
+                      ? "bg-primary text-primary-foreground font-semibold shadow-lg shadow-primary/50"
+                      : "bg-card border border-white/10 text-muted-foreground hover:text-foreground hover:border-primary/50"
+                      }`}
                   >
                     {page}
                   </button>
@@ -158,7 +157,7 @@ export default function HeuristicPanel({ data }) {
           <Card className="p-6 backdrop-blur-md bg-card/40 border-white/10">
             <div className="mb-4">
               <h2 className="text-xl font-bold text-foreground flex items-center gap-2">
-                <Code className="w-5 h-5 text-green-500" />
+                <Code className="w-5 h-5 text-foreground" />
                 Code Churn Analysis
               </h2>
               <p className="text-sm text-muted-foreground">Lines added vs deleted</p>
@@ -179,13 +178,13 @@ export default function HeuristicPanel({ data }) {
                   <YAxis stroke="rgba(255,255,255,0.5)" tick={{ fontSize: 11 }} />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: "rgba(15, 23, 42, 0.9)",
+                      backgroundColor: "hsl(0, 0%, 10%)",
                       border: "1px solid rgba(255,255,255,0.1)",
                       borderRadius: "8px",
                     }}
                   />
-                  <Bar dataKey="added" fill="#10b981" name="Lines Added" />
-                  <Bar dataKey="deleted" fill="#ef4444" name="Lines Deleted" />
+                  <Bar dataKey="added" fill="#22d3ee" name="Lines Added" />
+                  <Bar dataKey="deleted" fill="#f472b6" name="Lines Deleted" />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -215,7 +214,7 @@ export default function HeuristicPanel({ data }) {
                   <YAxis stroke="rgba(255,255,255,0.5)" tick={{ fontSize: 11 }} />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: "rgba(15, 23, 42, 0.9)",
+                      backgroundColor: "hsl(0, 0%, 10%)",
                       border: "1px solid rgba(255,255,255,0.1)",
                       borderRadius: "8px",
                     }}
@@ -223,7 +222,7 @@ export default function HeuristicPanel({ data }) {
                   <Line
                     type="monotone"
                     dataKey="score"
-                    stroke="#6366f1"
+                    stroke="#a855f7"
                     strokeWidth={3}
                     name="Impact Score"
                     dot={{ r: 5 }}

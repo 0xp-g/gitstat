@@ -132,7 +132,7 @@ export default function OverviewPage() {
             <Button
               onClick={handlePulseSearch}
               disabled={isScanning}
-              className="bg-primary hover:bg-primary/90 shadow-lg shadow-primary/50"
+              className="bg-foreground text-background hover:bg-foreground/90 shadow-lg"
             >
               {isScanning ? (
                 <>
@@ -152,14 +152,14 @@ export default function OverviewPage() {
               <Button
                 onClick={handleClearSearch}
                 variant="outline"
-                className="border-white/20 hover:bg-red-500/20"
+                className="border-white/20 hover:bg-secondary/20"
               >
                 Clear
               </Button>
             )}
           </div>
           {error && (
-            <div className="text-red-500 text-sm px-1 font-medium bg-red-500/10 p-2 rounded border border-red-500/20">
+            <div className="text-destructive text-sm px-1 font-medium bg-destructive/10 p-2 rounded border border-destructive/20">
               {error}
             </div>
           )}
