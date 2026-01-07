@@ -1,0 +1,131 @@
+"use client"
+
+import { Card } from "@/components/ui/card"
+import {
+  ScatterChart,
+  Scatter,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  ReferenceLine,
+  Label,
+} from "recharts"
+
+const quadrantColors = {
+  "Silent Architect": "rgba(139, 92, 246, 0.1)",
+  Superstar: "rgba(34, 197, 94, 0.1)",
+  Newcomer: "rgba(251, 191, 36, 0.1)",
+  Maintainer: "rgba(59, 130, 246, 0.1)",
+}
+
+export default function ImpactMatrix({ data }) {
+  const maxCommits = Math.max(...data.map((d) => d.totalCommits))
+  const maxImpact = Math.max(...data.map((d) => d.aiImpactScore))
+
+  const midCommits = maxCommits / 2
+  const midImpact = maxImpact / 2
+
+  const CustomTooltip = ({ active, payload }) => {
+    if (active && payload && payload.length) {
+      const data = payload[0].payload
+      return (
+        <div className="backdrop-blur-md bg-card/90 border border-white/10 rounded-lg p-3 shadow-xl">
+          <p className="font-semibold text-foreground">{data.username}</p>
+          <p className="text-sm text-muted-foreground">Commits: {data.totalCommits}</p>
+          <p className="text-sm text-muted-foreground">Impact Score: {data.aiImpactScore}</p>
+          <p className="text-sm text-muted-foreground">Total Changed: {data.linesAdded + data.linesDeleted} lines</p>
+          <p className="text-sm text-primary font-medium mt-1">{data.quadrant}</p>
+        </div>
+      )
+    }
+    return null
+  }
+
+  return (
+    <Card className="p-6 backdrop-blur-md bg-card/40 border-white/10">
+      <div className="mb-4">
+        <h2 className="text-2xl font-bold text-foreground">Impact Matrix</h2>
+        <p className="text-sm text-muted-foreground">Developer positioning by activity vs. logic impact</p>
+      </div>
+
+      <div className="h-[500px] relative">
+        <ResponsiveContainer width="100%" height="100%">
+          <ScatterChart margin={{ top: 20, right: 80, bottom: 60, left: 60 }}>
+            {/* Background quadrants */}
+            <defs>
+              <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+                <circle cx="2" cy="2" r="1" fill="rgba(255,255,255,0.05)" />
+              </pattern>
+            </defs>
+
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
+
+            <XAxis
+              type="number"
+              dataKey="totalCommits"
+              name="Activity Frequency"
+              stroke="rgba(255,255,255,0.5)"
+              tick={{ fill: "rgba(255,255,255,0.7)" }}
+            >
+              <Label
+                value="Activity Frequency (Commits)"
+                position="bottom"
+                offset={40}
+                style={{ fill: "rgba(255,255,255,0.7)" }}
+              />
+            </XAxis>
+
+            <YAxis
+              type="number"
+              dataKey="aiImpactScore"
+              name="Logic Impact"
+              stroke="rgba(255,255,255,0.5)"
+              tick={{ fill: "rgba(255,255,255,0.7)" }}
+            >
+              <Label
+                value="Logic Impact Score"
+                angle={-90}
+                position="left"
+                offset={40}
+                style={{ fill: "rgba(255,255,255,0.7)" }}
+              />
+            </YAxis>
+
+            <Tooltip content={<CustomTooltip />} />
+
+            {/* Reference lines for quadrants */}
+            <ReferenceLine x={midCommits} stroke="rgba(139, 92, 246, 0.5)" strokeWidth={2} />
+            <ReferenceLine y={midImpact} stroke="rgba(139, 92, 246, 0.5)" strokeWidth={2} />
+
+            <Scatter name="Developers" data={data} fill="#8b5cf6">
+              {data.map((entry, index) => (
+                <circle
+                  key={index}
+                  r={8}
+                  fill={
+                    entry.quadrant === "Silent Architect"
+                      ? "#8b5cf6"
+                      : entry.quadrant === "Superstar"
+                        ? "#22c55e"
+                        : entry.quadrant === "Maintainer"
+                          ? "#3b82f6"
+                          : "#fbbf24"
+                  }
+                  opacity={0.8}
+                />
+              ))}
+            </Scatter>
+          </ScatterChart>
+        </ResponsiveContainer>
+
+        {/* Quadrant labels */}
+        <div className="absolute top-8 left-16 text-xs text-primary font-medium">Silent Architect</div>
+        <div className="absolute top-8 right-24 text-xs text-green-500 font-medium">Superstar</div>
+        <div className="absolute bottom-24 left-16 text-xs text-yellow-500 font-medium">Newcomer</div>
+        <div className="absolute bottom-24 right-24 text-xs text-blue-500 font-medium">Maintainer</div>
+      </div>
+    </Card>
+  )
+}

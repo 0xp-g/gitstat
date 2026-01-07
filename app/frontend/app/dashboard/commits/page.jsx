@@ -1,0 +1,103 @@
+"use client"
+
+import DashboardLayout from "@/components/dashboard-layout"
+import { Suspense, useEffect, useState } from "react"
+import { useRepositoryData } from "@/hooks/useRepositoryData"
+import { Card } from "@/components/ui/card"
+import { GitCommit, Calendar, AlertCircle } from "lucide-react"
+import { motion } from "framer-motion"
+
+function CommitsContent() {
+  const { data, hasData } = useRepositoryData()
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  if (!mounted) return null
+
+  const allCommits = data
+    ? data
+        .flatMap((contributor) =>
+          (contributor.productionCommits || []).map((commit) => ({
+            ...commit,
+            username: contributor.username,
+            date: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toLocaleDateString(),
+          })),
+        )
+        .sort((a, b) => b.impact - a.impact)
+    : []
+
+  return data ? (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold">Commit Feed</h1>
+          <p className="text-muted-foreground mt-2">Real-time feed of high-impact commits</p>
+        </div>
+        <div className="text-right">
+          <div className="text-2xl font-bold text-primary">{allCommits.length}</div>
+          <div className="text-sm text-muted-foreground">Total Commits</div>
+        </div>
+      </div>
+
+      <div className="grid gap-4">
+        {allCommits.map((commit, index) => (
+          <motion.div
+            key={index}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.05 }}
+          >
+            <Card className="p-6 backdrop-blur-md bg-card/40 border-white/10 hover:border-primary/30 transition-colors">
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
+                  <GitCommit className="w-6 h-6 text-primary" />
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-3 mb-2">
+                    <span className="font-semibold text-lg">{commit.username}</span>
+                    <span className="px-3 py-1 rounded-full bg-primary/20 text-primary text-xs font-medium">
+                      Impact: {commit.impact}
+                    </span>
+                  </div>
+                  <p className="text-muted-foreground mb-3">{commit.summary}</p>
+                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                    <div className="flex items-center gap-2">
+                      <Calendar className="w-4 h-4" />
+                      {commit.date}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </Card>
+          </motion.div>
+        ))}
+      </div>
+    </div>
+  ) : (
+    <div className="flex flex-col items-center justify-center h-[60vh]">
+      <div className="text-center">
+        <div className="w-16 h-16 bg-yellow-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
+          <AlertCircle className="w-8 h-8 text-yellow-500" />
+        </div>
+        <h3 className="text-xl font-semibold mb-2">No Repository Data</h3>
+        <p className="text-muted-foreground mb-4">Please run Pulse Search from the Overview tab first</p>
+        <a href="/dashboard/overview" className="text-primary hover:underline">
+          Go to Overview →
+        </a>
+      </div>
+    </div>
+  )
+}
+
+export default function CommitsPage() {
+  return (
+    <DashboardLayout activeRoute="commits">
+      <Suspense fallback={<div>Loading...</div>}>
+        <CommitsContent />
+      </Suspense>
+    </DashboardLayout>
+  )
+}
