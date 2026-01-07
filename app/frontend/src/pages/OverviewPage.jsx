@@ -7,6 +7,10 @@ import { Input } from "@/components/ui/input"
 import { Search, Loader2 } from "lucide-react"
 import ImpactMatrix from "@/components/ImpactMatrix"
 import ComparativeChart from "@/components/ComparativeChart"
+import SilentArchitectSpotlight from "@/components/SilentArchitectSpotlight"
+import TeamHealthRadar from "@/components/TeamHealthRadar"
+import TrendAnalysis from "@/components/TrendAnalysis"
+import RiskAlerts from "@/components/RiskAlerts"
 import { fetchRepoCommits } from "@/services/api"
 import { transformCommitsToDeveloperData } from "@/utils/transformers"
 
@@ -207,6 +211,25 @@ export default function OverviewPage() {
 
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
               <ComparativeChart data={data} />
+            </motion.div>
+
+            {/* New Dashboard Panels */}
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
+              <SilentArchitectSpotlight data={data} />
+            </motion.div>
+
+            <div className="grid lg:grid-cols-2 gap-6">
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
+                <TeamHealthRadar data={data} />
+              </motion.div>
+
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
+                <RiskAlerts data={data} />
+              </motion.div>
+            </div>
+
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}>
+              <TrendAnalysis data={data} />
             </motion.div>
           </motion.div>
         )}
