@@ -9,3 +9,4 @@ httpx
 scikit-learn
 matplotlib
 sqlmodel
+requests
