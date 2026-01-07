@@ -13,6 +13,7 @@ import { transformCommitsToDeveloperData } from "@/utils/transformers"
 export default function OverviewPage() {
   const [repoUrl, setRepoUrl] = useState("https://github.com/0xp-g/time_limit_exceeded_E210")
   const [dateRange, setDateRange] = useState("30")
+  const [commitLimit, setCommitLimit] = useState("50")
   const [isScanning, setIsScanning] = useState(false)
   const [data, setData] = useState(null)
   const [error, setError] = useState(null)
@@ -73,7 +74,8 @@ export default function OverviewPage() {
     setData(null) // Clear previous data
 
     try {
-      const rawData = await fetchRepoCommits(owner, repo, 50); // Fetch last 50 commits
+      const limit = parseInt(commitLimit) || 50;
+      const rawData = await fetchRepoCommits(owner, repo, limit);
       const transformedData = transformCommitsToDeveloperData(rawData);
 
       setData(transformedData);
@@ -127,6 +129,19 @@ export default function OverviewPage() {
                 <option value="20">Last 20 days</option>
                 <option value="30">Last 30 days</option>
               </select>
+            </div>
+
+            <div className="w-32">
+              <label className="text-sm text-muted-foreground mb-2 block">No. of Commits</label>
+              <Input
+                type="number"
+                value={commitLimit}
+                onChange={(e) => setCommitLimit(e.target.value)}
+                placeholder="50"
+                min="1"
+                max="100"
+                className="bg-card border-white/10"
+              />
             </div>
 
             <Button
