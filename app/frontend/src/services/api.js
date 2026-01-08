@@ -1,9 +1,9 @@
 
 const API_BASE_URL = 'http://localhost:8000';
 
-export const fetchRepoCommits = async (owner, repo, limit = 50) => {
+export const fetchRepoCommits = async (owner, repo, limit = 50, include_ai = true) => {
    try {
-      const response = await fetch(`${API_BASE_URL}/repos/${owner}/${repo}/commits?limit=${limit}`, {
+      const response = await fetch(`${API_BASE_URL}/repos/${owner}/${repo}/commits?limit=${limit}&include_ai=${include_ai}`, {
          headers: {
             'Content-Type': 'application/json',
          },
@@ -58,6 +58,27 @@ export const fetchClosedIssues = async (repoUrl, limit = 20) => {
       return data;
    } catch (error) {
       console.error('Error fetching closed issues:', error);
+      throw error;
+   }
+};
+
+export const analyzeCommit = async (commitData) => {
+   try {
+      const response = await fetch(`${API_BASE_URL}/analysis/commit`, {
+         method: 'POST',
+         headers: {
+            'Content-Type': 'application/json',
+         },
+         body: JSON.stringify(commitData),
+      });
+
+      if (!response.ok) {
+         throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      return await response.json();
+   } catch (error) {
+      console.error('Error analyzing commit:', error);
       throw error;
    }
 };

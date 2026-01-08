@@ -11,7 +11,7 @@ import SilentArchitectSpotlight from "@/components/SilentArchitectSpotlight"
 import TeamHealthRadar from "@/components/TeamHealthRadar"
 import TrendAnalysis from "@/components/TrendAnalysis"
 import RiskAlerts from "@/components/RiskAlerts"
-import { fetchRepoCommits, fetchClosedIssues } from "@/services/api"
+import { fetchRepoCommits, fetchClosedIssues, analyzeCommit } from "@/services/api"
 import { transformCommitsToDeveloperData } from "@/utils/transformers"
 
 export default function OverviewPage() {
@@ -80,24 +80,60 @@ export default function OverviewPage() {
     try {
       const limit = parseInt(commitLimit) || 50;
 
-      // Fetch data in parallel
+      // Fetch data in parallel (fast mode, no AI Analysis initially)
       const [rawData, issuesData] = await Promise.all([
-        fetchRepoCommits(owner, repo, limit),
+        fetchRepoCommits(owner, repo, limit, false),
         fetchClosedIssues(repoUrl, 30) // Limit issues to 30 for now
       ]);
 
+      // 1. Immediate Render with Heuristic Data
       const transformedData = transformCommitsToDeveloperData(rawData, issuesData);
-
       setData(transformedData);
 
-      // Cache successful search
+      // Cache initial results
       sessionStorage.setItem("gitpulse_search_executed", "true")
       sessionStorage.setItem("gitpulse_has_data", "true")
       sessionStorage.setItem("gitpulse_data", JSON.stringify(transformedData))
+
+      setIsScanning(false) // Stop global loading spinner, allowing UI to show
+
+      // 2. Progressive Hydration (Background AI Analysis)
+      // Iterate through commits and enrich them
+      let currentCommits = [...rawData.commits];
+
+      // We'll process them sequentially to avoid overwhelming the 3-semaphore backend
+      // and to provide a smooth "streaming" update effect.
+      for (let i = 0; i < currentCommits.length; i++) {
+        try {
+          // Check if we need to analyze (skip if we already have Real AI data from cache)
+          const commitAnalysis = currentCommits[i].analysis;
+          if (commitAnalysis && commitAnalysis.analysis_type === "ai") {
+            continue;
+          }
+
+          const enrichedAnalysis = await analyzeCommit(currentCommits[i]);
+
+          // Update the specific commit
+          currentCommits[i] = { ...currentCommits[i], analysis: enrichedAnalysis };
+
+          // Re-transform with new data
+          const updatedData = transformCommitsToDeveloperData({ ...rawData, commits: currentCommits }, issuesData);
+
+          // Update UI
+          setData(updatedData);
+
+          // Update Cache
+          sessionStorage.setItem("gitpulse_data", JSON.stringify(updatedData));
+
+        } catch (e) {
+          console.error(`Failed to analyze commit ${currentCommits[i].sha}:`, e);
+          // Continue to next even if one fails
+        }
+      }
+
     } catch (error) {
       console.error("Scanning failed:", error);
       setError(`Failed to scan repository: ${error.message || "Unknown error"}`);
-    } finally {
       setIsScanning(false)
     }
   }

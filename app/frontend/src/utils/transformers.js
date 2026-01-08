@@ -3,7 +3,7 @@
  * for the dashboard.
  */
 export const transformCommitsToDeveloperData = (backendResponse, issuesResp = null) => {
-   const { commits, repo } = backendResponse;
+   const { commits, repo, user_stats } = backendResponse;
 
    if (!commits || !Array.isArray(commits)) {
       return [];
@@ -39,7 +39,8 @@ export const transformCommitsToDeveloperData = (backendResponse, issuesResp = nu
 
       // Store individual commit for "Production Commits" list
       const commitObj = {
-         summary: commit.message.split('\n')[0],
+         summary: analysis.review_summary || "Waiting for AI analysis...",
+         message: commit.message,
          impact: analysis.impact_score ? Math.round(analysis.impact_score / 10) : 0,
          date: new Date(commit.date).toISOString().split('T')[0],
          rawScore: analysis.impact_score
@@ -82,7 +83,21 @@ export const transformCommitsToDeveloperData = (backendResponse, issuesResp = nu
       });
    }
 
-   // 3. Calculate averages and assign quadrants
+   // 3. Merge with Backend User Stats (Lifetime Data)
+   if (user_stats) {
+      Object.keys(developers).forEach(username => {
+         if (user_stats[username]) {
+            const stats = user_stats[username];
+            developers[username].totalCommits = stats.commit_count;
+            developers[username].totalImpactScore = stats.total_impact;
+            developers[username].linesAdded = stats.lines_added;
+            developers[username].linesDeleted = stats.lines_deleted;
+            // distinct processed_shas logic if needed, but not needed for display
+         }
+      });
+   }
+
+   // 4. Calculate averages and assign quadrants
    return Object.values(developers).map(dev => {
       const avgImpact = dev.totalCommits > 0 ? Math.round(dev.totalImpactScore / dev.totalCommits) : 0;
       const heuristicScore = Math.min(100, avgImpact + 10);

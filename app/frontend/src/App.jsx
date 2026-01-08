@@ -11,8 +11,8 @@ import CommitsPage from "./pages/CommitsPage"
 import TeamsPage from "./pages/TeamsPage"
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
-  const [hasInitialized, setHasInitialized] = useState(false)
+  const [isLoggedIn, setIsLoggedIn] = useState(true)
+  const [hasInitialized, setHasInitialized] = useState(true)
   const navigate = useNavigate()
 
   useEffect(() => {

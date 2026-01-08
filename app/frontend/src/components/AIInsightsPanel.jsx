@@ -141,7 +141,12 @@ export default function AIInsightsPanel({ data }) {
                             Impact: {commit.impact}
                           </Badge>
                         </div>
-                        <p className="text-sm text-muted-foreground line-clamp-2">{commit.summary}</p>
+                        <p className="text-sm text-foreground mb-1 whitespace-pre-wrap font-mono text-xs bg-black/40 p-2 rounded border border-white/5">{commit.message}</p>
+                        {commit.summary && commit.summary !== "Waiting for AI analysis..." && (
+                          <p className="text-xs text-muted-foreground line-clamp-2 italic border-l-2 border-primary/30 pl-2">
+                            AI: {commit.summary}
+                          </p>
+                        )}
                       </div>
                     </div>
                   </motion.div>

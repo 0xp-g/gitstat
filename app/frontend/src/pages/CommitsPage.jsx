@@ -14,7 +14,7 @@ export default function CommitsPage() {
     // Check if search was actually executed
     const checkData = () => {
       const searchExecuted = sessionStorage.getItem("gitpulse_search_executed") === "true"
-      
+
       if (!searchExecuted) {
         setData(null)
         setLoading(false)
@@ -58,14 +58,14 @@ export default function CommitsPage() {
 
   const allCommits = data
     ? data
-        .flatMap((contributor) =>
-          (contributor.productionCommits || []).map((commit) => ({
-            ...commit,
-            username: contributor.username,
-            date: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toLocaleDateString(),
-          })),
-        )
-        .sort((a, b) => b.impact - a.impact)
+      .flatMap((contributor) =>
+        (contributor.productionCommits || []).map((commit) => ({
+          ...commit,
+          username: contributor.username,
+          date: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toLocaleDateString(),
+        })),
+      )
+      .sort((a, b) => b.impact - a.impact)
     : []
 
   if (loading) {
@@ -112,7 +112,16 @@ export default function CommitsPage() {
                       Impact: {commit.impact}
                     </span>
                   </div>
-                  <p className="text-muted-foreground mb-3">{commit.summary}</p>
+                  <div className="bg-black/40 p-3 rounded-md border border-white/5 mb-3">
+                    <p className="text-xs text-muted-foreground uppercase tracking-widest mb-1">Commit Message</p>
+                    <p className="text-sm text-foreground font-mono whitespace-pre-wrap">{commit.message}</p>
+                    {commit.summary && commit.summary !== "Waiting for AI analysis..." && (
+                      <div className="mt-2 pt-2 border-t border-white/10">
+                        <p className="text-xs text-muted-foreground uppercase tracking-widest mb-1 text-primary">AI Insight</p>
+                        <p className="text-sm text-muted-foreground italic">{commit.summary}</p>
+                      </div>
+                    )}
+                  </div>
                   <div className="flex items-center gap-4 text-sm text-muted-foreground">
                     <div className="flex items-center gap-2">
                       <Calendar className="w-4 h-4" />
