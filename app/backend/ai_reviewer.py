@@ -16,12 +16,15 @@ def get_real_ai_review(commit_data: Dict[str, Any]) -> Dict[str, Any]:
     Analyzes a commit using Google Gemini API to return a 'real' AI score and verification.
     """
     
+    author = commit_data.get("author", "Unknown")
+    print(f"DEBUG: get_real_ai_review called for {author}")
     if not GEMINI_API_KEY:
         print("WARNING: GEMINI_API_KEY not found. Returning fallback scores.")
         return {
-            "ai_score": 0,
-            "ai_review": "AI API Key missing.",
-            "complexity_level": "Unknown"
+            "impact_score": 0,
+            "review_summary": "AI API Key missing.",
+            "complexity": "Unknown",
+            "risk_level": "Unknown"
         }
 
     # Construct the prompt

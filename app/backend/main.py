@@ -284,11 +284,20 @@ async def get_commits(owner: str, repo: str, limit: int = 10, include_ai: bool =
                          final_analysis["impact_score"] = ai_data["impact_score"]
 
                     payload["analysis"] = final_analysis
+                    
+                    # SIDE EFFECT: Cache valid results immediately to speed up future requests
+                    summary = final_analysis.get("review_summary", "")
+                    if "AI quota exceeded" not in summary and "AI analysis failed" not in summary:
+                        # Note: This is not thread-safe for the file, but acceptable for this demo scale
+                        # We use a localized cache update
+                        cache[sha] = final_analysis
             
             return payload
 
         if payloads_to_analyze:
             detailed_results = await asyncio.gather(*[analyze_commit(p) for p in payloads_to_analyze])
+            # Save updated cache to disk once after batch
+            save_cache(cache)
         else:
             detailed_results = []
 
@@ -419,10 +428,29 @@ def analyze_single_commit(payload: CommitPayload):
     On-demand AI analysis for a single commit.
     Used for progressive loading.
     """
-    # Check cache first
+    # Check cache first (ignore bad fallback entries with score 0 or missing fields)
+    import sys
+    print(f"DEBUG: analyze_single_commit called for {payload.sha}", file=sys.stderr, flush=True)
     cache = load_cache()
     if payload.sha in cache:
-        return cache[payload.sha]
+        entry = cache[payload.sha]
+        
+        # Robustness Check
+        summary = str(entry.get("review_summary", "")).lower()
+        is_error = (
+            "ai api key missing" in summary or 
+            "ai quota exceeded" in summary or 
+            "ai analysis failed" in summary or
+            not summary
+        )
+        
+        if not is_error and entry.get("analysis_type") == "ai":
+            print(f"DEBUG: Cache HIT for {payload.sha}")
+            return entry
+        else:
+            print(f"DEBUG: Cache HIT but INVALID/HEURISTIC for {payload.sha}: {summary} (Type: {entry.get('analysis_type')})")
+
+    print(f"DEBUG: Cache MISS for {payload.sha}, proceeding to AI analysis")
 
     # Convert Pydantic model to dict
     data = payload.dict()
@@ -440,9 +468,11 @@ def analyze_single_commit(payload: CommitPayload):
     if ai_data.get("impact_score") and ai_data.get("impact_score") > 0:
         final_analysis["impact_score"] = ai_data["impact_score"]
     
-    # Save to cache if it was a successful AI response (not a fallback error)
+    # Save to cache if it was a successful AI response
     summary = final_analysis.get("review_summary", "")
-    if "AI quota exceeded" not in summary and "AI analysis failed" not in summary:
+    is_saveable_error = "ai quota exceeded" not in summary.lower() and "ai analysis failed" not in summary.lower() and "ai api key missing" not in summary.lower()
+    
+    if is_saveable_error and summary:
         cache[payload.sha] = final_analysis
         save_cache(cache)
         

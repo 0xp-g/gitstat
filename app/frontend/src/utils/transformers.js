@@ -121,17 +121,26 @@ export const transformCommitsToDeveloperData = (backendResponse, issuesResp = nu
       const growthScore = Math.min(100, Math.round(Math.random() * 30 + 70)); // Simulated high baseline
       const collaborationScore = Math.min(100, Math.round(Math.random() * 40 + 50)); // Simulated
 
+      // Calculate Average Soft Skills Score
+      const avgSoftSkills = Math.round((leadershipScore + communicationScore + growthScore + collaborationScore) / 4);
+
+      // Calculate Combined Impact Score
+      // Weighted: 60% Technical (Impact Score), 40% Soft Skills
+      const combinedImpactScore = Math.round((avgImpact * 0.6) + (avgSoftSkills * 0.4));
+
       return {
          softSkills: {
             leadership: leadershipScore,
             communication: communicationScore,
             growth: growthScore,
-            collaboration: collaborationScore
+            collaboration: collaborationScore,
+            average: avgSoftSkills
          },
          username: dev.username,
          totalCommits: dev.totalCommits,
          aiImpactScore: avgImpact,
          heuristicScore: heuristicScore,
+         combinedImpactScore: combinedImpactScore, // New Field
          linesAdded: dev.linesAdded,
          linesDeleted: dev.linesDeleted,
          quadrant: determineQuadrant(dev.totalCommits, avgImpact),

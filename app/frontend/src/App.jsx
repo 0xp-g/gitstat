@@ -8,14 +8,15 @@ import OverviewPage from "./pages/OverviewPage"
 import HeuristicPage from "./pages/HeuristicPage"
 import AIPage from "./pages/AIPage"
 import SoftSkillsPage from "./pages/SoftSkillsPage"
+import ImpactDashboard from "./pages/ImpactDashboard" // NEW
 import CommitsPage from "./pages/CommitsPage"
 import TeamsPage from "./pages/TeamsPage"
 import TeamDetailsPage from "./pages/TeamDetailsPage"
 import TeamComparisonPage from "./pages/TeamComparisonPage"
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(true)
-  const [hasInitialized, setHasInitialized] = useState(true)
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [hasInitialized, setHasInitialized] = useState(false)
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -42,6 +43,7 @@ function App() {
         <Route path="/heuristic" element={<HeuristicPage />} />
         <Route path="/ai" element={<AIPage />} />
         <Route path="/soft-skills" element={<SoftSkillsPage />} />
+        <Route path="/impact" element={<ImpactDashboard />} /> {/* NEW */}
         <Route path="/commits" element={<CommitsPage />} />
         <Route path="/teams" element={<TeamsPage />} />
         <Route path="/teams/compare" element={<TeamComparisonPage />} />

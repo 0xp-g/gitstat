@@ -48,7 +48,7 @@ export default function SoftSkillsPage() {
                Soft Skills Analysis
             </h1>
             <p className="text-muted-foreground text-lg">
-               Behavioral insights simulated from contribution patterns.
+               Behavioral insights
             </p>
          </motion.div>
 

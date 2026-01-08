@@ -103,6 +103,9 @@ export default function OverviewPage() {
 
       // We'll process them sequentially to avoid overwhelming the 3-semaphore backend
       // and to provide a smooth "streaming" update effect.
+      // Rate Limit Throttling: Wait 10s between requests to stay under 5 RPM limit
+      const RATE_LIMIT_DELAY = 10000;
+
       for (let i = 0; i < currentCommits.length; i++) {
         try {
           // Check if we need to analyze (skip if we already have Real AI data from cache)
@@ -124,6 +127,11 @@ export default function OverviewPage() {
 
           // Update Cache
           sessionStorage.setItem("gitpulse_data", JSON.stringify(updatedData));
+
+          // Wait before next request to respect rate limits
+          if (i < currentCommits.length - 1) {
+            await new Promise(resolve => setTimeout(resolve, RATE_LIMIT_DELAY));
+          }
 
         } catch (e) {
           console.error(`Failed to analyze commit ${currentCommits[i].sha}:`, e);
