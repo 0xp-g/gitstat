@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useNavigate } from "react-router-dom"
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -31,6 +32,7 @@ const saveTeams = (teams) => {
 }
 
 export default function TeamsPage() {
+   const navigate = useNavigate()
    const [teams, setTeams] = useState(() => getTeams())
    const [repoUrl, setRepoUrl] = useState("")
    const [contributors, setContributors] = useState([])
@@ -113,6 +115,16 @@ export default function TeamsPage() {
             <p className="text-muted-foreground mt-2">
                Fetch contributors from a repo and split them into teams
             </p>
+            <div className="flex gap-4 mt-4">
+               <Button
+                  variant="outline"
+                  onClick={() => navigate("/teams/compare")}
+                  className="border-primary/20 hover:bg-primary/10"
+               >
+                  <Users className="w-4 h-4 mr-2" />
+                  Compare Teams
+               </Button>
+            </div>
          </div>
 
          {/* Repo Input Section */}
@@ -228,7 +240,10 @@ export default function TeamsPage() {
                      animate={{ opacity: 1, y: 0 }}
                      transition={{ delay: index * 0.1 }}
                   >
-                     <Card className="p-5 backdrop-blur-md bg-card/60 border-primary/20 hover:border-primary/40 transition-all">
+                     <Card
+                        onClick={() => navigate(`/teams/${team.id}`)}
+                        className="p-5 backdrop-blur-md bg-card/60 border-primary/20 hover:border-primary/40 transition-all cursor-pointer hover:scale-[1.02]"
+                     >
                         <div className="flex items-start justify-between mb-3">
                            <div className="flex items-center gap-3">
                               <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
@@ -244,7 +259,10 @@ export default function TeamsPage() {
                            <Button
                               variant="ghost"
                               size="icon"
-                              onClick={() => handleDeleteTeam(team.id)}
+                              onClick={(e) => {
+                                 e.stopPropagation()
+                                 handleDeleteTeam(team.id)
+                              }}
                               className="h-8 w-8 hover:bg-destructive/20 text-destructive"
                            >
                               <Trash2 className="w-4 h-4" />
@@ -275,8 +293,9 @@ export default function TeamsPage() {
                      </Card>
                   </motion.div>
                ))}
-            </div>
-         )}
+            </div >
+         )
+         }
       </>
    )
 }

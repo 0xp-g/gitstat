@@ -13,13 +13,15 @@ export const transformCommitsToDeveloperData = (backendResponse, issuesResp = nu
 
    // 1. Process Commits
    commits.forEach((commit) => {
-      const authorName = commit.author || 'Unknown';
+      // Use login (username) as primary key to match Team Members
+      // Fallback to Author Name if login isn't available (e.g. valid git commit but not linked to user)
+      const primaryKey = commit.author_login || commit.author || 'Unknown';
       const stats = commit.total_stats || { additions: 0, deletions: 0 };
       const analysis = commit.analysis || {};
 
-      if (!developers[authorName]) {
-         developers[authorName] = {
-            username: authorName,
+      if (!developers[primaryKey]) {
+         developers[primaryKey] = {
+            username: primaryKey,
             totalCommits: 0,
             totalImpactScore: 0,
             totalHeuristicScore: 0,
@@ -31,7 +33,7 @@ export const transformCommitsToDeveloperData = (backendResponse, issuesResp = nu
          };
       }
 
-      const dev = developers[authorName];
+      const dev = developers[primaryKey];
       dev.totalCommits += 1;
       dev.linesAdded += stats.additions;
       dev.linesDeleted += stats.deletions;

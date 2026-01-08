@@ -54,7 +54,7 @@ export default function TeamComparisonPage() {
 
             // Fetch or reuse cached repo data
             if (!repoCache[repoKey]) {
-               repoCache[repoKey] = await fetchRepoCommits(team.repo.owner, team.repo.repo, 100)
+               repoCache[repoKey] = await fetchRepoCommits(team.repo.owner, team.repo.repo, 100, false) // Do not trigger AI analysis
             }
 
             const backendData = repoCache[repoKey]

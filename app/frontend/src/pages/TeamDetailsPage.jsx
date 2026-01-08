@@ -46,7 +46,8 @@ export default function TeamDetailsPage() {
                const backendData = await fetchRepoCommits(
                   foundTeam.repo.owner,
                   foundTeam.repo.repo,
-                  100
+                  100,
+                  false // Do not trigger AI analysis
                )
 
                // 3. Transform Data (this gives us per-developer metrics)

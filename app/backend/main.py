@@ -207,6 +207,7 @@ async def get_commits(owner: str, repo: str, limit: int = 10, include_ai: bool =
                     "sha": sha,
                     "message": commit_summary["commit"]["message"],
                     "author": commit_summary["commit"]["author"]["name"],
+                    "author_login": commit_summary["author"]["login"] if commit_summary.get("author") else None,
                     "date": commit_summary["commit"]["author"]["date"],
                     "total_stats": {"additions": 0, "deletions": 0},
                     "files": [],
@@ -242,6 +243,7 @@ async def get_commits(owner: str, repo: str, limit: int = 10, include_ai: bool =
                 "sha": sha,
                 "message": commit_summary["commit"]["message"],
                 "author": commit_summary["commit"]["author"]["name"],
+                "author_login": commit_summary["author"]["login"] if commit_summary.get("author") else None,
                 "date": commit_summary["commit"]["author"]["date"],
                 "total_stats": stats,
                 "files": file_changes
@@ -304,6 +306,7 @@ class CommitPayload(BaseModel):
     sha: str
     message: str
     author: str
+    author_login: str | None = None
     date: str
     total_stats: dict
     files: list

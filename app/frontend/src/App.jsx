@@ -9,6 +9,8 @@ import HeuristicPage from "./pages/HeuristicPage"
 import AIPage from "./pages/AIPage"
 import CommitsPage from "./pages/CommitsPage"
 import TeamsPage from "./pages/TeamsPage"
+import TeamDetailsPage from "./pages/TeamDetailsPage"
+import TeamComparisonPage from "./pages/TeamComparisonPage"
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(true)
@@ -40,6 +42,8 @@ function App() {
         <Route path="/ai" element={<AIPage />} />
         <Route path="/commits" element={<CommitsPage />} />
         <Route path="/teams" element={<TeamsPage />} />
+        <Route path="/teams/compare" element={<TeamComparisonPage />} />
+        <Route path="/teams/:teamId" element={<TeamDetailsPage />} />
       </Routes>
     </DashboardLayout>
   )
