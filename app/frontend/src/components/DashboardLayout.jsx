@@ -18,6 +18,7 @@ export default function DashboardLayout({ children }) {
     { icon: Users, label: "Teams", route: "/teams", active: location.pathname === "/teams" },
     { icon: TrendingUp, label: "Heuristic", route: "/heuristic", active: location.pathname === "/heuristic" },
     { icon: Sparkles, label: "AI", route: "/ai", active: location.pathname === "/ai" },
+    { icon: Users, label: "Soft Skills", route: "/soft-skills", active: location.pathname === "/soft-skills" },
     { icon: GitCommit, label: "Commit Feed", route: "/commits", active: location.pathname === "/commits" },
   ]
 

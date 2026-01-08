@@ -7,6 +7,7 @@ import DashboardLayout from "./components/DashboardLayout"
 import OverviewPage from "./pages/OverviewPage"
 import HeuristicPage from "./pages/HeuristicPage"
 import AIPage from "./pages/AIPage"
+import SoftSkillsPage from "./pages/SoftSkillsPage"
 import CommitsPage from "./pages/CommitsPage"
 import TeamsPage from "./pages/TeamsPage"
 import TeamDetailsPage from "./pages/TeamDetailsPage"
@@ -40,6 +41,7 @@ function App() {
         <Route path="/overview" element={<OverviewPage />} />
         <Route path="/heuristic" element={<HeuristicPage />} />
         <Route path="/ai" element={<AIPage />} />
+        <Route path="/soft-skills" element={<SoftSkillsPage />} />
         <Route path="/commits" element={<CommitsPage />} />
         <Route path="/teams" element={<TeamsPage />} />
         <Route path="/teams/compare" element={<TeamComparisonPage />} />
