@@ -262,9 +262,13 @@ async def get_commits(owner: str, repo: str, limit: int = 10, include_ai: bool =
             sha = payload["sha"]
             
             # Check if we have cached AI analysis
-            if sha in cache and cache[sha].get("impact_score", 0) > 0 and "heuristic" not in str(cache[sha].get("review_summary", "")).lower():
-                 payload["analysis"] = cache[sha]
-                 return payload
+            if sha in cache:
+                entry = cache[sha]
+                summary = str(entry.get("review_summary", ""))
+                # Only use cache if it has a score AND a non-empty summary AND is not heuristic
+                if entry.get("impact_score", 0) > 0 and summary and "heuristic" not in summary.lower():
+                     payload["analysis"] = entry
+                     return payload
 
             # Otherwise, run heuristics
             heuristic_data = apply_heuristics(payload)
@@ -428,60 +432,62 @@ def analyze_single_commit(payload: CommitPayload):
     On-demand AI analysis for a single commit.
     Used for progressive loading.
     """
-    # Check cache first (ignore bad fallback entries with score 0 or missing fields)
+    # Check cache first
     import sys
     print(f"DEBUG: analyze_single_commit called for {payload.sha}", file=sys.stderr, flush=True)
     cache = load_cache()
     if payload.sha in cache:
         entry = cache[payload.sha]
-        
-        # Robustness Check
         summary = str(entry.get("review_summary", "")).lower()
-        is_error = (
-            "ai api key missing" in summary or 
-            "ai quota exceeded" in summary or 
-            "ai analysis failed" in summary or
-            not summary
-        )
         
-        if not is_error and entry.get("analysis_type") == "ai":
-            print(f"DEBUG: Cache HIT for {payload.sha}")
+        # Robust Cache Check:
+        # 1. Must be analysis_type == 'ai'
+        # 2. Must have a non-empty summary
+        # 3. Summary must not be an error message
+        is_valid = (
+            entry.get("analysis_type") == "ai" and
+            summary and 
+            "ai api key missing" not in summary and
+            "ai quota exceeded" not in summary and
+            "ai analysis failed" not in summary
+        )
+
+        if is_valid:
+            print(f"DEBUG: Cache HIT for {payload.sha}", file=sys.stderr, flush=True)
             return entry
         else:
-            print(f"DEBUG: Cache HIT but INVALID/HEURISTIC for {payload.sha}: {summary} (Type: {entry.get('analysis_type')})")
+            print(f"DEBUG: Cache HIT but INVALID for {payload.sha} (Summary: {summary})", file=sys.stderr, flush=True)
 
-    print(f"DEBUG: Cache MISS for {payload.sha}, proceeding to AI analysis")
+    print(f"DEBUG: Cache MISS for {payload.sha}, proceeding to AI analysis", file=sys.stderr, flush=True)
 
     # Convert Pydantic model to dict
     data = payload.dict()
-    
+
     # 1. Re-apply heuristics (fast)
     heuristic_data = apply_heuristics(data)
-    
+
     # 2. Run Real AI
     ai_data = get_real_ai_review(data)
-    
+
     # 3. Merge
     final_analysis = {**heuristic_data, **ai_data}
     final_analysis["analysis_type"] = "ai" # Mark as Real AI
-    
+
     if ai_data.get("impact_score") and ai_data.get("impact_score") > 0:
         final_analysis["impact_score"] = ai_data["impact_score"]
-    
-    # Save to cache if it was a successful AI response
+
+    # Save to cache if it was a successful AI response (not a fallback error)
     summary = final_analysis.get("review_summary", "")
-    is_saveable_error = "ai quota exceeded" not in summary.lower() and "ai analysis failed" not in summary.lower() and "ai api key missing" not in summary.lower()
-    
-    if is_saveable_error and summary:
+    if "ai quota exceeded" not in summary.lower() and "ai analysis failed" not in summary.lower():
         cache[payload.sha] = final_analysis
         save_cache(cache)
-        
+
     # Update User Stats with new AI score (this handles re-processing logic)
     # We construct a minimal commit object for the update function
     commit_obj = data.copy()
     commit_obj["analysis"] = final_analysis
     update_user_stats(data.get("author_name") or data.get("author", "Unknown").split("/")[0], data.get("repo_name") or "unknown/repo", [commit_obj])
-        
+    
     return final_analysis
 
 @app.get("/issues/closed")

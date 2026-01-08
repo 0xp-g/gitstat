@@ -87,6 +87,11 @@ def get_real_ai_review(commit_data: Dict[str, Any]) -> Dict[str, Any]:
                 
         import json
         analysis = json.loads(text)
+        
+        # Ensure mandatory fields
+        if "review_summary" not in analysis:
+            analysis["review_summary"] = "AI Analysis completed but no summary provided."
+            
         return analysis
         
     except Exception as e:
