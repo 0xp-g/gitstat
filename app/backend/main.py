@@ -594,6 +594,7 @@ def apply_heuristics(commit_data):
     
     return {
         "impact_score": impact_score,
+        "heuristic_impact_score": impact_score, # Preserve original score
         "category": category,
         "tags": tags,
         "complexity": complexity_score,

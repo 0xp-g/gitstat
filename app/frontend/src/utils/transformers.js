@@ -36,6 +36,7 @@ export const transformCommitsToDeveloperData = (backendResponse, issuesResp = nu
       dev.linesAdded += stats.additions;
       dev.linesDeleted += stats.deletions;
       dev.totalImpactScore += analysis.impact_score || 0;
+      dev.totalHeuristicScore += analysis.heuristic_impact_score || analysis.impact_score || 0;
 
       // Store individual commit for "Production Commits" list
       const commitObj = {
@@ -100,7 +101,7 @@ export const transformCommitsToDeveloperData = (backendResponse, issuesResp = nu
    // 4. Calculate averages and assign quadrants
    return Object.values(developers).map(dev => {
       const avgImpact = dev.totalCommits > 0 ? Math.round(dev.totalImpactScore / dev.totalCommits) : 0;
-      const heuristicScore = Math.min(100, avgImpact + 10);
+      const heuristicScore = dev.totalCommits > 0 ? Math.round(dev.totalHeuristicScore / dev.totalCommits) : 0;
 
       return {
          username: dev.username,
