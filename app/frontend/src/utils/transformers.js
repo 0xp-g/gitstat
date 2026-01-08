@@ -37,8 +37,14 @@ export const transformCommitsToDeveloperData = (backendResponse, issuesResp = nu
       dev.totalCommits += 1;
       dev.linesAdded += stats.additions;
       dev.linesDeleted += stats.deletions;
-      dev.totalImpactScore += analysis.impact_score || 0;
-      dev.totalHeuristicScore += analysis.heuristic_impact_score || analysis.impact_score || 0;
+      // Strict separation: Only add to AI score if explicitly an AI analysis
+      if (analysis.analysis_type === 'ai') {
+         dev.totalImpactScore += analysis.impact_score || 0;
+      }
+
+      // Always track heuristic score (from dedicated field or fall back to impact_score if type is heuristic)
+      dev.totalHeuristicScore += analysis.heuristic_impact_score ||
+         (analysis.analysis_type === 'heuristic' ? analysis.impact_score : 0) || 0;
 
       // Store individual commit for "Production Commits" list
       const commitObj = {
@@ -58,7 +64,9 @@ export const transformCommitsToDeveloperData = (backendResponse, issuesResp = nu
       issuesResp.data.forEach(issue => {
          // Determine credit: 'solved_by' >> 'closed_by' 
          // If 'solved_by' isn't set, fallback is already handled in backend, but let's be safe.
-         const solver = issue.solved_by || issue.closed_by;
+         // Determine credit: User requested 'created_by' to be the solver.
+         // Fallback to 'solved_by' (backend logic) or 'closed_by' if created_by is missing.
+         const solver = issue.created_by || issue.solved_by || issue.closed_by;
 
          if (solver) {
             // Initiate dev if not exists (e.g. someone who only closes issues but no commits in range)
@@ -80,7 +88,9 @@ export const transformCommitsToDeveloperData = (backendResponse, issuesResp = nu
                id: issue.issue_number,
                title: issue.issue_title,
                complexity: issue.complexity_score,
-               url: issue.issue_url
+               url: issue.issue_url,
+               closed_by: issue.closed_by,
+               created_by: issue.created_by
             });
          }
       });

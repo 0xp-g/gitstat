@@ -173,7 +173,15 @@ export default function AIInsightsPanel({ data }) {
                             #{issue.id}
                           </Badge>
                         </div>
-                        <p className="text-sm text-muted-foreground mb-2">{issue.title}</p>
+                        <p className="text-sm text-muted-foreground mb-1">{issue.title}</p>
+                        {issue.closed_by && (
+                          <div className="flex items-center gap-1 mb-2">
+                            <span className="text-xs text-muted-foreground">Closed by:</span>
+                            <Badge variant="outline" className="text-[10px] px-1 py-0 border-white/10 text-muted-foreground">
+                              {issue.closed_by}
+                            </Badge>
+                          </div>
+                        )}
                         <div className="flex items-center gap-2">
                           <span className="text-xs text-muted-foreground">Complexity:</span>
                           <div className="flex gap-1">

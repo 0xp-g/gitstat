@@ -79,17 +79,30 @@ export default function TeamComparisonPage() {
                   avgHeuristic: Math.round(avgHeuristic),
                   avgAiImpact: Math.round(avgAiImpact),
                   memberCount: teamDevelopers.length
-               },
-               // Data for ComparativeChart (expects username, heuristicScore, aiImpactScore)
-               chartData: {
-                  username: team.name,
-                  heuristicScore: avgHeuristic,
-                  aiImpactScore: avgAiImpact
                }
             }
          }))
 
-         setComparisonData(teamsWithMetrics)
+         // Flatten all developers from selected teams for the comparison chart
+         // Use a map to handle duplicates if a user is in multiple teams (show them once or aggregate? 
+         // User likely wants to see the person compared. Let's show unique developers.)
+         const uniqueDevs = new Map();
+         teamsWithMetrics.forEach(team => {
+            team.developers.forEach(dev => {
+               if (!uniqueDevs.has(dev.username)) {
+                  uniqueDevs.set(dev.username, {
+                     username: dev.username,
+                     heuristicScore: dev.heuristicScore,
+                     aiImpactScore: dev.aiImpactScore,
+                     teamName: team.name // Optional: track which team they came from first
+                  });
+               }
+            });
+         });
+
+         const chartData = Array.from(uniqueDevs.values());
+
+         setComparisonData({ teams: teamsWithMetrics, chartData });
 
       } catch (err) {
          console.error(err)
@@ -171,12 +184,12 @@ export default function TeamComparisonPage() {
          {/* Results Area */}
          {comparisonData && (
             <div className="space-y-8">
-               {/* 1. Bar Chart Comparison */}
-               <ComparativeChart data={comparisonData.map(d => d.chartData)} />
+               {/* 1. Bar Chart Comparison (Members) */}
+               <ComparativeChart data={comparisonData.chartData} />
 
                {/* 2. Side-by-Side Team Cards */}
                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {comparisonData.map(team => (
+                  {comparisonData.teams.map(team => (
                      <Card key={team.id} className="p-5 backdrop-blur-md bg-card/40 border-primary/10">
                         <div className="text-center mb-4">
                            <h3 className="font-bold text-lg text-primary">{team.name}</h3>

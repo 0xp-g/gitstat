@@ -65,8 +65,8 @@ export default function ComparativeChart({ data }) {
               }}
               iconType="circle"
             />
-            <Bar dataKey="heuristic" stackId="a" fill="#a855f7" name="Heuristic Score" radius={[0, 0, 0, 0]} />
-            <Bar dataKey="aiImpact" stackId="a" fill="#06b6d4" name="AI Impact Score" radius={[4, 4, 0, 0]} />
+            <Bar dataKey="heuristic" fill="#a855f7" name="Heuristic Score" radius={[4, 4, 0, 0]} />
+            <Bar dataKey="aiImpact" fill="#06b6d4" name="AI Impact Score" radius={[4, 4, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </div>

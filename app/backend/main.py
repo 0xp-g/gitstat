@@ -497,6 +497,10 @@ def get_closed_issues(repo_url: str, limit: int = 10):
         # OR leave it empty. Let's use closed_by as fallback if solver is None
         if not solver:
             solver = closed_by_user
+            
+        # Final fallback: If user created and closed it themselves (common in solo repos), or just created it and it got closed
+        if not solver:
+            solver = created_by
 
         results.append({
             "issue_number": issue["number"],
