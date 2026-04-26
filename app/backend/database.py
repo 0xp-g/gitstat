@@ -1,6 +1,6 @@
 from sqlmodel import SQLModel, create_engine, Session
 
-# This creates a file 'hacktide.db' automatically
+
 sqlite_file_name = "mydemo.db"
 sqlite_url = f"sqlite:///{sqlite_file_name}"
 
